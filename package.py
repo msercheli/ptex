@@ -2,7 +2,7 @@
 
 name = "ptex"
 
-version = "2.1.28"
+version = "2.3.2"
 
 authors = ["Walt Disney Animation Studio"]
 
@@ -12,4 +12,4 @@ def commands():
     if building:
         env.CMAKE_MODULE_PATH.append("{root}/cmake")
 
-uuid = "repository.ptexs"
+uuid = "repository.ptex"
