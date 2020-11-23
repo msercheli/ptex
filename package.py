@@ -2,14 +2,20 @@
 
 name = "ptex"
 
-version = "2.3.2"
+version = "4.1.4"
 
 authors = ["Walt Disney Animation Studio"]
 
+requires = [
+    "gcc",
+    "cmake",
+    "zlib",
+]
+
+build_system = "cmake"
+
 def commands():
-    env.PATH.prepend("{root}/bin")
-    env.LD_LIBRARY_PATH.append("{root}/lib")
-    if building:
-        env.CMAKE_MODULE_PATH.append("{root}/cmake")
+    env.PTEX_ROOT = "{root}"
+    env.PTEX_LOCATION = "{root}"
 
 uuid = "repository.ptex"

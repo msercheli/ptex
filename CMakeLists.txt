@@ -1,7 +1,4 @@
 cmake_minimum_required(VERSION 3.8.0)
-
-include(RezBuild)
-
 project(Ptex)
 
 option(PTEX_BUILD_STATIC_LIBS "Enable building Ptex static libraries" ON)
