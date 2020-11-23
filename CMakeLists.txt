@@ -23,7 +23,22 @@ else ()
 endif ()
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS ON)
-set(CMAKE_INSTALL_MESSAGE LAZY) # Silence "Up-to-date:" install messages
+set(CMAKE_INSTALL_MESSAGE LAZY)
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
+include(GNUInstallDirs)
+
+include(CTest)
+enable_testing()
+
+# Setup platform-specific threading flags.
+find_package(Threads REQUIRED)
+
+# Use pkg-config to create a PkgConfig::Ptex_ZLIB imported target
+find_package(PkgConfig REQUIRED)
+pkg_checK_modules(Ptex_ZLIB REQUIRED zlib IMPORTED_TARGET)
+
 
 if (NOT DEFINED PTEX_SHA)
     # Query git for current commit ID
@@ -40,12 +55,16 @@ if (NOT DEFINED PTEX_VER)
         file(STRINGS "${PROJECT_SOURCE_DIR}/version" PTEX_VER)
     else ()
         execute_process(
-            COMMAND git describe --first-parent --always HEAD
+            COMMAND git describe --match=v[0-9]*.[0-9]* --first-parent HEAD
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE PTEX_VER
             OUTPUT_STRIP_TRAILING_WHITESPACE)
     endif ()
 endif ()
+# Provide a fallback version when the Git repository is unavailable.
+if (NOT PTEX_VER)
+    set(PTEX_VER "v2.3.X")
+endif()
 
 # Transform PTEX_VER into PTEX_MAJOR_VERSION and PTEX_MINOR_VERSION
 string(REPLACE "v" "" PTEX_VER_STRIPPED ${PTEX_VER})  # strip leading "v"
@@ -58,16 +77,6 @@ endif ()
 # The version variables are used to generate PtexVersion.h
 list(GET PTEX_VER_LIST 0 PTEX_MAJOR_VERSION)
 list(GET PTEX_VER_LIST 1 PTEX_MINOR_VERSION)
-
-include(GNUInstallDirs)
-include(CTest)
-include(FindThreads)
-
-# Use pkg-config to create a PkgConfig::Ptex_ZLIB imported target
-find_package(PkgConfig REQUIRED)
-pkg_checK_modules(Ptex_ZLIB REQUIRED zlib IMPORTED_TARGET)
-
-enable_testing()
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     # Detect the build type from the $FLAVOR environment variable
@@ -93,6 +102,13 @@ if (MSVC)
         /wd4244
         /D_CRT_SECURE_NO_WARNINGS
     )
+endif()
+
+# Set the default Ptex library to use for tools and tests.
+if (PTEX_BUILD_STATIC_LIBS)
+    set(PTEX_LIBRARY Ptex_static)
+else()
+    set(PTEX_LIBRARY Ptex_dynamic)
 endif()
 
 if (${PRMAN_15_COMPATIBLE_PTEX})
