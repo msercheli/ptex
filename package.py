@@ -9,7 +9,6 @@ authors = ["Walt Disney Animation Studio"]
 requires = [
     "gcc",
     "cmake",
-    "zlib",
 ]
 
 build_system = "cmake"
