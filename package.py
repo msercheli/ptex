@@ -16,5 +16,6 @@ build_system = "cmake"
 def commands():
     env.PTEX_ROOT = "{root}"
     env.PTEX_LOCATION = "{root}"
+    env.PATH.append("{root}/bin")
 
 uuid = "repository.ptex"
